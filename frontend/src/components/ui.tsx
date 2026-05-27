@@ -8,8 +8,8 @@ export function BigButton({
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'danger' }) {
   const styles = {
-    primary: 'bg-brand text-paper hover:bg-brandDark',
-    secondary: 'bg-paper text-ink border-4 border-ink hover:bg-soft',
+    primary: 'bg-graphite text-paper hover:bg-graphiteDark',
+    secondary: 'bg-paper text-ink border-4 border-graphite hover:bg-soft',
     danger: 'bg-danger text-paper hover:bg-red-800',
   }[variant];
   return (
@@ -25,8 +25,8 @@ export function BigButton({
 export function BigLink({ to, children, variant = 'primary' }: { to: string; children: ReactNode; variant?: 'primary' | 'secondary' }) {
   const styles =
     variant === 'primary'
-      ? 'bg-brand text-paper hover:bg-brandDark'
-      : 'bg-paper text-ink border-4 border-ink hover:bg-soft';
+      ? 'bg-graphite text-paper hover:bg-graphiteDark'
+      : 'bg-paper text-ink border-4 border-graphite hover:bg-soft';
   return (
     <Link
       to={to}
@@ -49,7 +49,7 @@ export function Field({
       {hint && <span className="block text-base text-gray-600 mb-2">{hint}</span>}
       <input
         {...props}
-        className="w-full min-h-[60px] px-4 py-3 text-lg rounded-xl border-4 border-gray-400 focus:border-brand bg-paper"
+        className="w-full min-h-[60px] px-4 py-3 text-lg rounded-xl border-4 border-gray-400 focus:border-amberDark bg-paper"
       />
     </label>
   );
@@ -65,7 +65,7 @@ export function SelectField({
       <span className="block text-lg font-bold mb-2">{label}</span>
       <select
         {...props}
-        className="w-full min-h-[60px] px-4 py-3 text-lg rounded-xl border-4 border-gray-400 focus:border-brand bg-paper"
+        className="w-full min-h-[60px] px-4 py-3 text-lg rounded-xl border-4 border-gray-400 focus:border-amberDark bg-paper"
       >
         {children}
       </select>
@@ -73,7 +73,20 @@ export function SelectField({
   );
 }
 
-// Estrutura de página: título grande, passo opcional, conteúdo centralizado.
+// Cabeçalho grafite com a logo, presente em todas as telas.
+export function Header() {
+  return (
+    <header className="bg-graphite">
+      <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-center">
+        <Link to="/">
+          <img src="/logo.png" alt="Nutriçãozinho" className="h-16 w-auto" />
+        </Link>
+      </div>
+    </header>
+  );
+}
+
+// Estrutura de página: cabeçalho com logo, título grande, passo opcional, conteúdo centralizado.
 export function PageShell({
   title,
   step,
@@ -86,10 +99,11 @@ export function PageShell({
   back?: { to: string; label: string };
 }) {
   return (
-    <div className="min-h-screen bg-soft py-8 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-soft">
+      <Header />
+      <div className="max-w-2xl mx-auto py-8 px-4">
         {back && (
-          <Link to={back.to} className="inline-block mb-6 text-lg font-bold text-brand underline">
+          <Link to={back.to} className="inline-block mb-6 text-lg font-bold text-amberDark underline">
             ← {back.label}
           </Link>
         )}

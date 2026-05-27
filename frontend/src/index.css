@@ -12,7 +12,7 @@
   }
   /* Foco bem visível para acessibilidade. */
   *:focus-visible {
-    outline: 4px solid #15803d;
+    outline: 4px solid #d9831f;
     outline-offset: 2px;
   }
 }

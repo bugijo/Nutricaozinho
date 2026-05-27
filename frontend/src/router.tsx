@@ -8,6 +8,7 @@ import { KitchenSheetPage } from './pages/KitchenSheetPage';
 import { ShoppingListPage } from './pages/ShoppingListPage';
 import { PricingPage } from './pages/PricingPage';
 import { AlertsPage } from './pages/AlertsPage';
+import { SettingsPage } from './pages/SettingsPage';
 
 export const router = createBrowserRouter([
   { path: '/', element: <HomePage /> },
@@ -19,4 +20,5 @@ export const router = createBrowserRouter([
   { path: '/lotes/:id/preco', element: <PricingPage /> },
   { path: '/compras', element: <ShoppingListPage /> },
   { path: '/alertas', element: <AlertsPage /> },
+  { path: '/configuracoes', element: <SettingsPage /> },
 ]);

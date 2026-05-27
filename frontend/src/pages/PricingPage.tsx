@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { api } from '../api';
+import { api, type Setting } from '../api';
 import { BigButton, Card, ErrorBox, Field, PageShell } from '../components/ui';
 
 interface Pricing {
@@ -23,6 +23,16 @@ export function PricingPage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // Pré-preenche com os defaults das Configurações.
+    api
+      .get<Setting>('/settings')
+      .then((s) => {
+        setMargin(s.defaultMarginPercent);
+        setPackaging(s.packagingUnitCost);
+        setLaborRate(s.laborCostPerHour);
+      })
+      .catch(() => {});
+    // Se já houver precificação salva, mostra.
     api.get<Pricing>(`/batches/${id}/pricing`).then(setResult).catch(() => {});
   }, [id]);
 
@@ -63,11 +73,11 @@ export function PricingPage() {
             <li className="flex justify-between"><span>Embalagem</span><span>R$ {result.packagingCost}</span></li>
             <li className="flex justify-between"><span>Mão de obra</span><span>R$ {result.laborCost}</span></li>
             <li className="flex justify-between font-bold border-t-4 border-gray-200 pt-2"><span>Custo total</span><span>R$ {result.totalCost}</span></li>
-            <li className="flex justify-between text-brand"><span>Lucro ({result.marginPercent}%)</span><span>R$ {result.profit}</span></li>
+            <li className="flex justify-between text-amberDark font-bold"><span>Lucro ({result.marginPercent}%)</span><span>R$ {result.profit}</span></li>
           </ul>
-          <div className="mt-5 bg-brand text-paper rounded-xl p-5 text-center">
+          <div className="mt-5 bg-graphite text-paper rounded-xl p-5 text-center">
             <p className="text-lg">Preço de venda sugerido</p>
-            <p className="text-3xl font-extrabold">R$ {result.suggestedPrice}</p>
+            <p className="text-3xl font-extrabold text-amber">R$ {result.suggestedPrice}</p>
           </div>
         </Card>
       )}

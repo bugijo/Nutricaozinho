@@ -53,13 +53,13 @@ export function ShoppingListPage() {
           <h2 className="text-2xl font-extrabold">Comprar:</h2>
           {list.items.length === 0 && <Card><p className="text-lg">Nenhum lote programado neste período.</p></Card>}
           {list.items.map((i) => (
-            <Card key={i.name}>
+            <div key={i.name} className="bg-paper rounded-2xl border-4 border-gray-200 border-l-8 border-l-amber p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <span className="text-2xl font-bold">{i.name}</span>
-                <span className="text-3xl font-extrabold text-brand">{i.kilos} kg</span>
+                <span className="text-3xl font-extrabold text-ink">{i.kilos} kg</span>
               </div>
               <p className="text-lg text-gray-600 text-right">~ R$ {i.estimatedCost.toFixed(2)}</p>
-            </Card>
+            </div>
           ))}
           {list.items.length > 0 && (
             <Card>

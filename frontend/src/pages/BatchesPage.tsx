@@ -7,11 +7,14 @@ export function BatchesPage() {
   const [diets, setDiets] = useState<Diet[]>([]);
   const [batches, setBatches] = useState<Batch[]>([]);
   const [error, setError] = useState('');
+  const [notice, setNotice] = useState('');
 
+  const today = new Date().toISOString().slice(0, 10);
   const [dietId, setDietId] = useState('');
   const [count, setCount] = useState('30');
   const [weight, setWeight] = useState('350');
-  const [plannedDate, setPlannedDate] = useState(new Date().toISOString().slice(0, 10));
+  const [plannedDate, setPlannedDate] = useState(today);
+  const [startDate, setStartDate] = useState(today);
 
   async function load() {
     const [d, b] = await Promise.all([api.get<Diet[]>('/diets'), api.get<Batch[]>('/batches')]);
@@ -25,14 +28,27 @@ export function BatchesPage() {
 
   async function save() {
     setError('');
+    setNotice('');
     try {
       await api.post('/batches', {
         dietId,
         packageCount: Number(count),
         packageWeightGrams: Number(weight),
         plannedDate,
+        startConsumptionDate: startDate,
       });
       await load();
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }
+
+  async function generateAlert(batchId: string) {
+    setError('');
+    setNotice('');
+    try {
+      await api.post('/alerts', { batchId });
+      setNotice('Aviso de recompra gerado! Veja em "Avisos de Recompra".');
     } catch (e) {
       setError((e as Error).message);
     }
@@ -41,6 +57,9 @@ export function BatchesPage() {
   return (
     <PageShell title="Criar Lote de Produção" step="Passo 4 de 6" back={{ to: '/', label: 'Voltar ao início' }}>
       {error && <ErrorBox message={error} />}
+      {notice && (
+        <div className="bg-amber/20 border-4 border-amberDark text-ink rounded-xl p-4 text-lg font-bold">{notice}</div>
+      )}
 
       <Card>
         <div className="space-y-5">
@@ -57,6 +76,13 @@ export function BatchesPage() {
             <Field label="Peso de cada pacote (g)" type="number" value={weight} onChange={(e) => setWeight(e.target.value)} />
           </div>
           <Field label="Data de produção" type="date" value={plannedDate} onChange={(e) => setPlannedDate(e.target.value)} />
+          <Field
+            label="Data de início do consumo"
+            hint="Quando o cliente vai começar a dar a comida (base do aviso de recompra)."
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
           <BigButton onClick={save} disabled={!dietId}>
             Criar Lote e Calcular
           </BigButton>
@@ -74,12 +100,17 @@ export function BatchesPage() {
             {b.daysOfFood && ` · dura ~${Math.round(Number(b.daysOfFood))} dias`}
           </p>
           <div className="grid grid-cols-2 gap-4">
-            <Link to={`/lotes/${b.id}/ficha`} className="flex items-center justify-center min-h-[56px] bg-brand text-paper rounded-xl text-lg font-bold">
+            <Link to={`/lotes/${b.id}/ficha`} className="flex items-center justify-center min-h-[56px] bg-graphite text-paper rounded-xl text-lg font-bold">
               Ficha de Cozinha
             </Link>
-            <Link to={`/lotes/${b.id}/preco`} className="flex items-center justify-center min-h-[56px] border-4 border-ink rounded-xl text-lg font-bold">
+            <Link to={`/lotes/${b.id}/preco`} className="flex items-center justify-center min-h-[56px] border-4 border-graphite rounded-xl text-lg font-bold">
               Preço de Venda
             </Link>
+          </div>
+          <div className="mt-4">
+            <BigButton variant="secondary" onClick={() => generateAlert(b.id)}>
+              Gerar aviso de recompra
+            </BigButton>
           </div>
         </Card>
       ))}

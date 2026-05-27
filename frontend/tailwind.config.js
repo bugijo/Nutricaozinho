@@ -4,12 +4,15 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Alto contraste: fundo claro, texto escuro, ação em verde forte.
-        ink: '#1a1a1a',
+        // Paleta da logo: grafite (fundo escuro), âmbar (laranja), branco e cinza-claro.
+        graphite: '#353537',
+        graphiteDark: '#2b2b2d',
+        amber: '#f2a640',
+        amberDark: '#d9831f',
+        ink: '#2e2a27', // texto escuro (alto contraste)
         paper: '#ffffff',
-        soft: '#f5f7f5',
-        brand: '#15803d', // verde 700
-        brandDark: '#166534',
+        soft: '#f5f1ea', // fundo creme quente
+        line: '#d9d9d9',
         danger: '#b91c1c',
       },
       fontSize: {

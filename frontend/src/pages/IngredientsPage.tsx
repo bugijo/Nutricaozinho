@@ -17,6 +17,7 @@ const EMPTY = {
 export function IngredientsPage() {
   const [items, setItems] = useState<Ingredient[]>([]);
   const [form, setForm] = useState({ ...EMPTY });
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -31,11 +32,32 @@ export function IngredientsPage() {
     setForm((f) => ({ ...f, [field]: value }));
   }
 
+  function startEdit(it: Ingredient) {
+    setEditingId(it.id);
+    setForm({
+      name: it.name,
+      category: it.category,
+      purchasePrice: it.purchasePrice,
+      purchaseWeightGrams: it.purchaseWeightGrams,
+      kcalPer100g: it.kcalPer100g,
+      proteinPer100g: it.proteinPer100g,
+      fiberPer100g: it.fiberPer100g,
+      carbPer100g: it.carbPer100g,
+      fatPer100g: it.fatPer100g,
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setForm({ ...EMPTY });
+  }
+
   async function save() {
     setError('');
     setSaving(true);
     try {
-      await api.post('/ingredients', {
+      const payload = {
         name: form.name,
         category: form.category,
         purchasePrice: Number(form.purchasePrice),
@@ -45,8 +67,13 @@ export function IngredientsPage() {
         fiberPer100g: Number(form.fiberPer100g),
         carbPer100g: Number(form.carbPer100g),
         fatPer100g: form.fatPer100g ? Number(form.fatPer100g) : 0,
-      });
-      setForm({ ...EMPTY });
+      };
+      if (editingId) {
+        await api.put(`/ingredients/${editingId}`, payload);
+      } else {
+        await api.post('/ingredients', payload);
+      }
+      cancelEdit();
       await load();
     } catch (e) {
       setError((e as Error).message);
@@ -58,6 +85,7 @@ export function IngredientsPage() {
   async function remove(id: string) {
     try {
       await api.del(`/ingredients/${id}`);
+      if (editingId === id) cancelEdit();
       await load();
     } catch (e) {
       setError((e as Error).message);
@@ -66,7 +94,7 @@ export function IngredientsPage() {
 
   return (
     <PageShell
-      title="Cadastrar Ingredientes"
+      title={editingId ? 'Editar Ingrediente' : 'Cadastrar Ingredientes'}
       step="Passo 1 de 6"
       back={{ to: '/', label: 'Voltar ao início' }}
     >
@@ -97,8 +125,13 @@ export function IngredientsPage() {
           </div>
 
           <BigButton onClick={save} disabled={saving || !form.name}>
-            {saving ? 'Salvando...' : 'Salvar Ingrediente'}
+            {saving ? 'Salvando...' : editingId ? 'Salvar Alterações' : 'Salvar Ingrediente'}
           </BigButton>
+          {editingId && (
+            <BigButton variant="secondary" onClick={cancelEdit}>
+              Cancelar edição
+            </BigButton>
+          )}
         </div>
       </Card>
 
@@ -112,9 +145,14 @@ export function IngredientsPage() {
                 {CATEGORY_LABELS[it.category]} · R$ {it.purchasePrice} / {it.purchaseWeightGrams}g · {it.kcalPer100g} Kcal/100g
               </p>
             </div>
-            <button onClick={() => remove(it.id)} className="text-danger font-bold text-base underline shrink-0">
-              Excluir
-            </button>
+            <div className="flex flex-col gap-2 shrink-0">
+              <button onClick={() => startEdit(it)} className="text-amberDark font-bold text-base underline">
+                Editar
+              </button>
+              <button onClick={() => remove(it.id)} className="text-danger font-bold text-base underline">
+                Excluir
+              </button>
+            </div>
           </div>
         </Card>
       ))}

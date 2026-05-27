@@ -32,17 +32,17 @@ export function KitchenSheetPage() {
             {sheet.daysOfFood && <p className="text-xl">Dura aproximadamente {Math.round(sheet.daysOfFood)} dias</p>}
           </Card>
 
-          <h2 className="text-2xl font-extrabold pt-2">Pese e cozinhe:</h2>
+          <h2 className="text-2xl font-extrabold pt-2 text-amberDark">Pese e cozinhe:</h2>
           {sheet.ingredients.map((i) => (
-            <Card key={i.name}>
+            <div key={i.name} className="bg-paper rounded-2xl border-4 border-gray-200 border-l-8 border-l-amber p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <span className="text-2xl font-bold">{i.name}</span>
-                <span className="text-3xl font-extrabold text-brand">
+                <span className="text-3xl font-extrabold text-ink">
                   {(i.gramsTotal / 1000).toFixed(2)} kg
                 </span>
               </div>
               <p className="text-lg text-gray-600 text-right">({Math.round(i.gramsTotal)} gramas)</p>
-            </Card>
+            </div>
           ))}
         </>
       )}

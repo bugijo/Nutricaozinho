@@ -94,6 +94,13 @@ export interface KitchenSheet {
   ingredients: { name: string; gramsTotal: number }[];
 }
 
+export interface Setting {
+  laborCostPerHour: string;
+  packagingUnitCost: string;
+  defaultMarginPercent: string;
+  reminderBufferDays: number;
+}
+
 export const CATEGORY_LABELS: Record<Category, string> = {
   PROTEIN: 'Proteína',
   CARB: 'Carboidrato',

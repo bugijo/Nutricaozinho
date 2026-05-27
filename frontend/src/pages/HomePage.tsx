@@ -10,6 +10,9 @@ export function HomePage() {
       <BigLink to="/lotes">4. Criar Lote de Produção</BigLink>
       <BigLink to="/compras">5. Lista de Compras da Semana</BigLink>
       <BigLink to="/alertas">6. Avisos de Recompra</BigLink>
+      <BigLink to="/configuracoes" variant="secondary">
+        Configurações (custos e margem)
+      </BigLink>
     </PageShell>
   );
 }

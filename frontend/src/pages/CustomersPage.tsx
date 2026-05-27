@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api, type Customer } from '../api';
+import { api, type Customer, type Pet } from '../api';
 import { BigButton, Card, ErrorBox, Field, PageShell, SelectField } from '../components/ui';
 
 export function CustomersPage() {
@@ -10,7 +10,8 @@ export function CustomersPage() {
   const [custName, setCustName] = useState('');
   const [custPhone, setCustPhone] = useState('');
 
-  // Pet novo
+  // Pet (novo ou edição)
+  const [editingPetId, setEditingPetId] = useState<string | null>(null);
   const [petName, setPetName] = useState('');
   const [petWeight, setPetWeight] = useState('');
   const [petFactor, setPetFactor] = useState('1.6');
@@ -37,17 +38,36 @@ export function CustomersPage() {
     }
   }
 
+  function startEditPet(p: Pet) {
+    setEditingPetId(p.id);
+    setPetName(p.name);
+    setPetWeight(p.weightKg);
+    setPetFactor(p.activityFactor);
+    setPetCustomerId(p.customerId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function cancelEditPet() {
+    setEditingPetId(null);
+    setPetName('');
+    setPetWeight('');
+  }
+
   async function savePet() {
     setError('');
     try {
-      await api.post('/pets', {
+      const payload = {
         name: petName,
         weightKg: Number(petWeight),
         activityFactor: Number(petFactor),
         customerId: petCustomerId,
-      });
-      setPetName('');
-      setPetWeight('');
+      };
+      if (editingPetId) {
+        await api.put(`/pets/${editingPetId}`, payload);
+      } else {
+        await api.post('/pets', payload);
+      }
+      cancelEditPet();
       await load();
     } catch (e) {
       setError((e as Error).message);
@@ -69,7 +89,7 @@ export function CustomersPage() {
         </div>
       </Card>
 
-      <h2 className="text-xl font-bold pt-4">Agora, cadastre o pet</h2>
+      <h2 className="text-xl font-bold pt-4">{editingPetId ? 'Editar o pet' : 'Agora, cadastre o pet'}</h2>
       <Card>
         <div className="space-y-5">
           <SelectField label="De qual cliente é o pet?" value={petCustomerId} onChange={(e) => setPetCustomerId(e.target.value)}>
@@ -89,8 +109,13 @@ export function CustomersPage() {
             <option value="2.0">Muito ativo (2.0)</option>
           </SelectField>
           <BigButton onClick={savePet} disabled={!petName || !petWeight || !petCustomerId}>
-            Salvar Pet
+            {editingPetId ? 'Salvar Alterações do Pet' : 'Salvar Pet'}
           </BigButton>
+          {editingPetId && (
+            <BigButton variant="secondary" onClick={cancelEditPet}>
+              Cancelar edição
+            </BigButton>
+          )}
         </div>
       </Card>
 
@@ -99,9 +124,14 @@ export function CustomersPage() {
         <Card key={c.id}>
           <p className="text-lg font-bold">{c.name}</p>
           {c.phone && <p className="text-base text-gray-600">{c.phone}</p>}
-          <ul className="mt-2 text-base">
+          <ul className="mt-2 text-base space-y-1">
             {(c.pets ?? []).map((p) => (
-              <li key={p.id}>🐶 {p.name} — {p.weightKg} kg</li>
+              <li key={p.id} className="flex items-center justify-between">
+                <span>🐶 {p.name} — {p.weightKg} kg</span>
+                <button onClick={() => startEditPet(p)} className="text-amberDark font-bold underline shrink-0">
+                  Editar
+                </button>
+              </li>
             ))}
           </ul>
         </Card>
