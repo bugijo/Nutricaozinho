@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: nutricaozinho-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nutri
+      POSTGRES_PASSWORD: nutri
+      POSTGRES_DB: nutricaozinho
+    ports:
+      - '5432:5432'
+    volumes:
+      - nutri_pgdata:/var/lib/postgresql/data
+
+volumes:
+  nutri_pgdata:
