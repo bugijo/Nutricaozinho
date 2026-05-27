@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, createHashRouter } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { IngredientsPage } from './pages/IngredientsPage';
 import { CustomersPage } from './pages/CustomersPage';
@@ -10,7 +10,7 @@ import { PricingPage } from './pages/PricingPage';
 import { AlertsPage } from './pages/AlertsPage';
 import { SettingsPage } from './pages/SettingsPage';
 
-export const router = createBrowserRouter([
+const routes = [
   { path: '/', element: <HomePage /> },
   { path: '/ingredientes', element: <IngredientsPage /> },
   { path: '/clientes', element: <CustomersPage /> },
@@ -21,4 +21,10 @@ export const router = createBrowserRouter([
   { path: '/compras', element: <ShoppingListPage /> },
   { path: '/alertas', element: <AlertsPage /> },
   { path: '/configuracoes', element: <SettingsPage /> },
-]);
+];
+
+// Quando o app é aberto direto de um arquivo (file://, demo offline baixada),
+// usa rotas por hash (#) para funcionar sem servidor. Em produção (http/https),
+// usa rotas normais.
+const openedFromFile = typeof window !== 'undefined' && window.location.protocol === 'file:';
+export const router = openedFromFile ? createHashRouter(routes) : createBrowserRouter(routes);

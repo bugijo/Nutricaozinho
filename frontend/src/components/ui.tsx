@@ -6,6 +6,7 @@ import type {
   ChangeEvent,
 } from 'react';
 import { Link } from 'react-router-dom';
+import logoUrl from '../assets/logo.png';
 
 // Botão largo e descritivo, mínimo 64px de altura, fácil de tocar/clicar.
 export function BigButton({
@@ -98,7 +99,7 @@ export function Header() {
     <header className="bg-graphite">
       <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-center">
         <Link to="/">
-          <img src="/logo.png" alt="Nutriçãozinho" className="h-16 w-auto" />
+          <img src={logoUrl} alt="Nutriçãozinho" className="h-16 w-auto" />
         </Link>
       </div>
     </header>

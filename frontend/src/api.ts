@@ -1,5 +1,10 @@
-// Cliente HTTP simples para a API do Nutriçãozinho.
-const BASE = '/api';
+// Cliente HTTP da API do Nutriçãozinho.
+// - VITE_USE_MOCK=true  -> usa dados falsos em memória (preview/demonstração, sem backend).
+// - VITE_API_URL=...    -> base da API em produção (ex: https://api.exemplo.com). Padrão: /api (proxy do Vite em dev).
+import { mockApi } from './mock/mockApi';
+
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === 'true';
+const BASE = import.meta.env.VITE_API_URL || '/api';
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
@@ -14,7 +19,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return res.json();
 }
 
-export const api = {
+const realApi = {
   get: <T>(path: string) => request<T>(path),
   post: <T>(path: string, body: unknown) =>
     request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
@@ -22,6 +27,8 @@ export const api = {
     request<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
   del: (path: string) => request<void>(path, { method: 'DELETE' }),
 };
+
+export const api = USE_MOCK ? mockApi : realApi;
 
 // ---- Tipos compartilhados (espelham o backend) ----
 export type Category = 'PROTEIN' | 'CARB' | 'FIBER' | 'FAT' | 'SUPPLEMENT' | 'OTHER';

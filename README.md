@@ -53,6 +53,27 @@ npm run dev                   # app em http://localhost:5173
 
 O Vite faz proxy de `/api` para a API em `:3333`.
 
+> Em desenvolvimento (`npm run dev`) o app roda em **modo demonstração (mock)** por padrão
+> (arquivo `frontend/.env.development`): funciona sem backend, com dados de exemplo em memória.
+> Para usar a API real localmente, mude `VITE_USE_MOCK` para `false`.
+
+## Modo demonstração e variáveis
+
+- `VITE_USE_MOCK=true` — usa dados falsos em memória (sem backend). Bom para demonstração.
+- `VITE_API_URL=https://.../api` — endereço da API real em produção (padrão em dev: `/api`).
+
+Para gerar um arquivo único que abre offline no navegador (duplo-clique):
+
+```bash
+cd frontend && VITE_USE_MOCK=true npx vite build --config vite.demo.config.ts
+# resultado: frontend/dist-demo/index.html (autocontido)
+```
+
+## Publicar online (deploy)
+
+Passo a passo completo e gratuito em **[DEPLOY.md](./DEPLOY.md)** (Neon + Render + Vercel),
+incluindo uma opção de demonstração online em ~5 minutos.
+
 ## Testes
 
 ```bash
