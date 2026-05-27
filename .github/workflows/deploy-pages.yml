@@ -3,7 +3,7 @@ name: Publicar demo (GitHub Pages)
 # Publica a versão de demonstração (mock, sem backend) no GitHub Pages.
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, claude/nutricionzinho-pet-system-3xG3g]
   workflow_dispatch:
 
 permissions:
