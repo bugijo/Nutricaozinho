@@ -57,10 +57,10 @@ export function PricingPage() {
       <Card>
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Horas de trabalho" type="number" value={laborHours} onChange={(e) => setLaborHours(e.target.value)} />
-            <Field label="Custo por hora (R$)" type="number" value={laborRate} onChange={(e) => setLaborRate(e.target.value)} />
-            <Field label="Embalagem por pacote (R$)" type="number" value={packaging} onChange={(e) => setPackaging(e.target.value)} />
-            <Field label="Margem de lucro (%)" type="number" value={margin} onChange={(e) => setMargin(e.target.value)} />
+            <Field label="Horas de trabalho" numeric value={laborHours} onChange={(e) => setLaborHours(e.target.value)} />
+            <Field label="Custo por hora (R$)" numeric value={laborRate} onChange={(e) => setLaborRate(e.target.value)} />
+            <Field label="Embalagem por pacote (R$)" numeric value={packaging} onChange={(e) => setPackaging(e.target.value)} />
+            <Field label="Margem de lucro (%)" numeric value={margin} onChange={(e) => setMargin(e.target.value)} />
           </div>
           <BigButton onClick={calculate}>Calcular Preço</BigButton>
         </div>

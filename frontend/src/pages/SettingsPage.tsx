@@ -51,27 +51,27 @@ export function SettingsPage() {
           <Field
             label="Custo do seu trabalho por hora (R$)"
             hint="Quanto vale 1 hora do seu trabalho na cozinha."
-            type="number"
+            numeric
             value={laborCostPerHour}
             onChange={(e) => setLaborCostPerHour(e.target.value)}
           />
           <Field
             label="Custo da embalagem por pacote (R$)"
-            type="number"
+            numeric
             value={packagingUnitCost}
             onChange={(e) => setPackagingUnitCost(e.target.value)}
           />
           <Field
             label="Margem de lucro padrão (%)"
             hint="Já vem preenchida ao calcular o preço de um lote."
-            type="number"
+            numeric
             value={defaultMarginPercent}
             onChange={(e) => setDefaultMarginPercent(e.target.value)}
           />
           <Field
             label="Avisar quantos dias antes de acabar?"
             hint="Ex: 5 = avisa 5 dias antes da comida do cliente terminar."
-            type="number"
+            numeric
             value={reminderBufferDays}
             onChange={(e) => setReminderBufferDays(e.target.value)}
           />

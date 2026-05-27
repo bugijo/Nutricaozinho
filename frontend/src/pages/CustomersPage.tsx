@@ -101,7 +101,7 @@ export function CustomersPage() {
             ))}
           </SelectField>
           <Field label="Nome do pet" value={petName} onChange={(e) => setPetName(e.target.value)} placeholder="Ex: Chloe" />
-          <Field label="Peso do pet (kg)" type="number" value={petWeight} onChange={(e) => setPetWeight(e.target.value)} placeholder="10" />
+          <Field label="Peso do pet (kg)" numeric value={petWeight} onChange={(e) => setPetWeight(e.target.value)} placeholder="10" />
           <SelectField label="Nível de atividade" value={petFactor} onChange={(e) => setPetFactor(e.target.value)}>
             <option value="1.2">Parado / castrado (1.2)</option>
             <option value="1.4">Pouco ativo (1.4)</option>

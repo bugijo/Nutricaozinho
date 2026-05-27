@@ -1,4 +1,10 @@
-import type { ReactNode, ButtonHTMLAttributes, InputHTMLAttributes, SelectHTMLAttributes } from 'react';
+import type {
+  ReactNode,
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  SelectHTMLAttributes,
+  ChangeEvent,
+} from 'react';
 import { Link } from 'react-router-dom';
 
 // Botão largo e descritivo, mínimo 64px de altura, fácil de tocar/clicar.
@@ -38,17 +44,30 @@ export function BigLink({ to, children, variant = 'primary' }: { to: string; chi
 }
 
 // Campo de texto/número com rótulo grande.
+// `numeric`: aceita vírgula (padrão PT-BR, ex: 1,6) e converte para ponto
+// antes de atualizar o estado/enviar para a API.
 export function Field({
   label,
   hint,
+  numeric,
+  onChange,
   ...props
-}: InputHTMLAttributes<HTMLInputElement> & { label: string; hint?: string }) {
+}: InputHTMLAttributes<HTMLInputElement> & { label: string; hint?: string; numeric?: boolean }) {
+  const handleChange = numeric
+    ? (e: ChangeEvent<HTMLInputElement>) => {
+        e.target.value = e.target.value.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+        onChange?.(e);
+      }
+    : onChange;
+  const numericProps = numeric ? ({ type: 'text', inputMode: 'decimal' } as const) : {};
   return (
     <label className="block">
       <span className="block text-lg font-bold mb-2">{label}</span>
       {hint && <span className="block text-base text-gray-600 mb-2">{hint}</span>}
       <input
         {...props}
+        {...numericProps}
+        onChange={handleChange}
         className="w-full min-h-[60px] px-4 py-3 text-lg rounded-xl border-4 border-gray-400 focus:border-amberDark bg-paper"
       />
     </label>

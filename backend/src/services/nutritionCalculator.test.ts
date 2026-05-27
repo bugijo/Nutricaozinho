@@ -45,6 +45,22 @@ describe('buildDailyRecipe', () => {
   it('exige ao menos um ingrediente', () => {
     expect(() => buildDailyRecipe(10, 1.6, { proteinPercent: 35, fiberPercent: 30, carbPercent: 30 }, [])).toThrow();
   });
+
+  it('inclui com 0g o ingrediente cujo macro não tem proporção na dieta', () => {
+    const recipe = buildDailyRecipe(
+      10,
+      1.6,
+      { proteinPercent: 100, fiberPercent: 0, carbPercent: 0 },
+      [
+        ingredients[0], // PROTEIN -> recebe gramas
+        { ingredientId: 's', name: 'Suplemento', role: 'SUPPLEMENT', kcalPer100g: 300, shareWithinGroup: 1, pricePerGram: 0.1 },
+      ]
+    );
+    const sup = recipe.ingredients.find((i) => i.ingredientId === 's');
+    expect(sup).toBeDefined();
+    expect(sup!.gramsPerDay).toBe(0);
+    expect(recipe.ingredients.find((i) => i.ingredientId === 'p')!.gramsPerDay).toBeGreaterThan(0);
+  });
 });
 
 describe('scaleRecipeToBatch', () => {

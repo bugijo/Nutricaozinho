@@ -72,8 +72,8 @@ export function BatchesPage() {
             ))}
           </SelectField>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Quantos pacotes?" type="number" value={count} onChange={(e) => setCount(e.target.value)} />
-            <Field label="Peso de cada pacote (g)" type="number" value={weight} onChange={(e) => setWeight(e.target.value)} />
+            <Field label="Quantos pacotes?" numeric value={count} onChange={(e) => setCount(e.target.value)} />
+            <Field label="Peso de cada pacote (g)" numeric value={weight} onChange={(e) => setWeight(e.target.value)} />
           </div>
           <Field label="Data de produção" type="date" value={plannedDate} onChange={(e) => setPlannedDate(e.target.value)} />
           <Field

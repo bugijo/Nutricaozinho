@@ -23,7 +23,12 @@ const ingredientSchema = z.object({
 ingredientsRouter.get(
   '/',
   asyncHandler(async (_req, res) => {
-    const ingredients = await prisma.ingredient.findMany({ orderBy: { name: 'asc' } });
+    // Só ingredientes ativos: os inativados (soft-delete) ficam ocultos para
+    // novas dietas, mas continuam existindo para não quebrar lotes antigos.
+    const ingredients = await prisma.ingredient.findMany({
+      where: { active: true },
+      orderBy: { name: 'asc' },
+    });
     res.json(ingredients);
   })
 );
@@ -55,10 +60,11 @@ ingredientsRouter.put(
   })
 );
 
+// Soft-delete: apenas inativa o ingrediente (preserva o histórico dos lotes).
 ingredientsRouter.delete(
   '/:id',
   asyncHandler(async (req, res) => {
-    await prisma.ingredient.delete({ where: { id: req.params.id } });
+    await prisma.ingredient.update({ where: { id: req.params.id }, data: { active: false } });
     res.status(204).send();
   })
 );

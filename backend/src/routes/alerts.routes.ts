@@ -33,16 +33,17 @@ alertsRouter.post(
       include: { pet: true },
     });
     if (!batch) throw new HttpError(404, 'Lote não encontrado.');
-    if (!batch.startConsumptionDate) {
-      throw new HttpError(400, 'Defina a data de início do consumo no lote antes de gerar o alerta.');
-    }
     if (!batch.daysOfFood) {
       throw new HttpError(400, 'O lote não possui dias de comida calculados.');
     }
 
+    // Lotes antigos podem não ter data de início do consumo: usa a data de
+    // criação do lote como base para calcular o vencimento.
+    const baseDate = batch.startConsumptionDate ?? batch.createdAt;
+
     const settings = await getSettings();
     const days = Number(batch.daysOfFood) - settings.reminderBufferDays;
-    const reminderDate = new Date(batch.startConsumptionDate);
+    const reminderDate = new Date(baseDate);
     reminderDate.setDate(reminderDate.getDate() + Math.max(0, Math.floor(days)));
 
     const alert = await prisma.alert.upsert({

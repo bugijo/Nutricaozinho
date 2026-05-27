@@ -90,9 +90,9 @@ export function DietsPage() {
 
           <p className="text-lg font-bold pt-2">Proporção da dieta (%)</p>
           <div className="grid grid-cols-3 gap-4">
-            <Field label="Proteína" type="number" value={protein} onChange={(e) => setProtein(e.target.value)} />
-            <Field label="Fibra" type="number" value={fiber} onChange={(e) => setFiber(e.target.value)} />
-            <Field label="Carbo" type="number" value={carb} onChange={(e) => setCarb(e.target.value)} />
+            <Field label="Proteína" numeric value={protein} onChange={(e) => setProtein(e.target.value)} />
+            <Field label="Fibra" numeric value={fiber} onChange={(e) => setFiber(e.target.value)} />
+            <Field label="Carbo" numeric value={carb} onChange={(e) => setCarb(e.target.value)} />
           </div>
 
           <p className="text-lg font-bold pt-2">Escolha os ingredientes</p>
@@ -141,10 +141,21 @@ export function DietsPage() {
             {preview.ingredients.map((i) => (
               <li key={i.ingredientId} className="flex justify-between border-b-2 border-gray-100 py-1">
                 <span>{i.name}</span>
-                <strong>{i.gramsPerDay} g</strong>
+                <strong className={i.gramsPerDay === 0 ? 'text-amberDark' : ''}>{i.gramsPerDay} g</strong>
               </li>
             ))}
           </ul>
+
+          {preview.ingredients
+            .filter((i) => i.gramsPerDay === 0)
+            .map((i) => (
+              <div
+                key={i.ingredientId}
+                className="mt-4 bg-amber/20 border-4 border-amberDark text-ink rounded-xl p-4 text-lg font-bold"
+              >
+                Atenção: {i.name} ficou com 0g pois não se encaixa nas proporções desta dieta.
+              </div>
+            ))}
         </Card>
       )}
     </PageShell>

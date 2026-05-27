@@ -112,16 +112,16 @@ export function IngredientsPage() {
           </SelectField>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Preço pago (R$)" type="number" value={form.purchasePrice} onChange={(e) => set('purchasePrice', e.target.value)} placeholder="20" />
-            <Field label="Para quantos gramas?" type="number" value={form.purchaseWeightGrams} onChange={(e) => set('purchaseWeightGrams', e.target.value)} placeholder="1000" />
+            <Field label="Preço pago (R$)" numeric value={form.purchasePrice} onChange={(e) => set('purchasePrice', e.target.value)} placeholder="20" />
+            <Field label="Para quantos gramas?" numeric value={form.purchaseWeightGrams} onChange={(e) => set('purchaseWeightGrams', e.target.value)} placeholder="1000" />
           </div>
 
           <p className="text-lg font-bold pt-2">Tabela nutricional (por 100g)</p>
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Calorias (Kcal)" type="number" value={form.kcalPer100g} onChange={(e) => set('kcalPer100g', e.target.value)} />
-            <Field label="Proteína (g)" type="number" value={form.proteinPer100g} onChange={(e) => set('proteinPer100g', e.target.value)} />
-            <Field label="Fibra (g)" type="number" value={form.fiberPer100g} onChange={(e) => set('fiberPer100g', e.target.value)} />
-            <Field label="Carboidrato (g)" type="number" value={form.carbPer100g} onChange={(e) => set('carbPer100g', e.target.value)} />
+            <Field label="Calorias (Kcal)" numeric value={form.kcalPer100g} onChange={(e) => set('kcalPer100g', e.target.value)} />
+            <Field label="Proteína (g)" numeric value={form.proteinPer100g} onChange={(e) => set('proteinPer100g', e.target.value)} />
+            <Field label="Fibra (g)" numeric value={form.fiberPer100g} onChange={(e) => set('fiberPer100g', e.target.value)} />
+            <Field label="Carboidrato (g)" numeric value={form.carbPer100g} onChange={(e) => set('carbPer100g', e.target.value)} />
           </div>
 
           <BigButton onClick={save} disabled={saving || !form.name}>

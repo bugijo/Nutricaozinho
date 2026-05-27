@@ -96,7 +96,12 @@ export function buildDailyRecipe(
 
   for (const ing of ingredients) {
     const groupFraction = groupFractions.get(ing.role);
-    if (!groupFraction) continue; // ingrediente fora dos macros calculados (ex: suplemento)
+    if (!groupFraction) {
+      // Ingrediente cujo macro não tem proporção nesta dieta: entra com 0g
+      // para que a interface possa avisar o usuário (não some silenciosamente).
+      results.push({ ingredientId: ing.ingredientId, name: ing.name, gramsPerDay: 0, kcalPerDay: 0 });
+      continue;
+    }
     if (!(ing.kcalPer100g > 0)) {
       throw new Error(`Ingrediente "${ing.name}" precisa de kcal/100g maior que zero.`);
     }

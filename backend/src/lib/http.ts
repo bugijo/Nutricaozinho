@@ -44,8 +44,20 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
   if (err instanceof Prisma.PrismaClientValidationError) {
     return res.status(400).json({ error: 'Dados inválidos para o banco de dados.' });
   }
+  // Banco indisponível / pânico do engine: não vaza detalhes internos.
+  if (
+    err instanceof Prisma.PrismaClientInitializationError ||
+    err instanceof Prisma.PrismaClientRustPanicError ||
+    err instanceof Prisma.PrismaClientUnknownRequestError
+  ) {
+    return res.status(503).json({ error: 'Banco de dados indisponível no momento. Tente novamente.' });
+  }
   if (err instanceof Error) {
     // Erros lançados pelos services (validações de domínio) viram 400.
+    // Defesa extra: qualquer erro do Prisma que escape não deve vazar a mensagem crua.
+    if (err.name.startsWith('PrismaClient')) {
+      return res.status(500).json({ error: 'Erro ao acessar o banco de dados.' });
+    }
     return res.status(400).json({ error: err.message });
   }
   return res.status(500).json({ error: 'Erro interno do servidor' });
