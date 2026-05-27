@@ -1,0 +1,10 @@
+{
+  "name": "nutricaozinho",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sistema de cálculo de alimentação natural para cães e gestão de produção de pet shop",
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
+}

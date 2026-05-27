@@ -1,0 +1,187 @@
+// Sistema "Nutriçãozinho" — alimentação natural para cães e produção de pet shop.
+// Banco PostgreSQL (Supabase). Dinheiro e medidas usam Decimal para precisão.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------- CRM ----------
+model Customer {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String?
+  email     String?
+  notes     String?
+  pets      Pet[]
+  alerts    Alert[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------- Pet ----------
+model Pet {
+  id             String   @id @default(uuid())
+  name           String
+  weightKg       Decimal  @db.Decimal(6, 2)
+  activityFactor Decimal  @db.Decimal(4, 2) // ex: 1.6
+  notes          String?
+  customerId     String
+  customer       Customer @relation(fields: [customerId], references: [id])
+  diets          Diet[]
+  batches        Batch[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ---------- Ingredientes ----------
+enum IngredientCategory {
+  PROTEIN
+  CARB
+  FIBER
+  FAT
+  SUPPLEMENT
+  OTHER
+}
+
+model Ingredient {
+  id                  String             @id @default(uuid())
+  name                String
+  category            IngredientCategory
+  // Preço pago por peso: ex R$ 20,00 por 1000g
+  purchasePrice       Decimal            @db.Decimal(10, 2)
+  purchaseWeightGrams Decimal            @db.Decimal(10, 2)
+  // Tabela nutricional por 100g
+  kcalPer100g         Decimal            @db.Decimal(8, 2)
+  proteinPer100g      Decimal            @db.Decimal(8, 2)
+  fiberPer100g        Decimal            @db.Decimal(8, 2)
+  carbPer100g         Decimal            @db.Decimal(8, 2)
+  fatPer100g          Decimal            @default(0) @db.Decimal(8, 2)
+  active              Boolean            @default(true)
+  dietItems           DietItem[]
+  batchItems          BatchItem[]
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+}
+
+// ---------- Dieta / Receita ----------
+model Diet {
+  id             String     @id @default(uuid())
+  name           String
+  petId          String
+  pet            Pet        @relation(fields: [petId], references: [id])
+  // Proporções calóricas (0-100). Ex: 35 / 30 / 30
+  proteinPercent Decimal    @db.Decimal(5, 2)
+  fiberPercent   Decimal    @db.Decimal(5, 2)
+  carbPercent    Decimal    @db.Decimal(5, 2)
+  active         Boolean    @default(true)
+  items          DietItem[]
+  batches        Batch[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+// Qual ingrediente preenche qual macro, e sua fatia dentro do grupo (0-1)
+model DietItem {
+  id               String             @id @default(uuid())
+  dietId           String
+  diet             Diet               @relation(fields: [dietId], references: [id], onDelete: Cascade)
+  ingredientId     String
+  ingredient       Ingredient         @relation(fields: [ingredientId], references: [id])
+  role             IngredientCategory
+  shareWithinGroup Decimal            @default(1.0) @db.Decimal(5, 4)
+}
+
+// ---------- Lotes / Produção ----------
+enum BatchStatus {
+  PLANNED
+  COOKING
+  DONE
+  DELIVERED
+}
+
+model Batch {
+  id                   String      @id @default(uuid())
+  dietId               String
+  diet                 Diet        @relation(fields: [dietId], references: [id])
+  petId                String
+  pet                  Pet         @relation(fields: [petId], references: [id])
+  packageCount         Int
+  packageWeightGrams   Decimal     @db.Decimal(8, 2)
+  status               BatchStatus @default(PLANNED)
+  plannedDate          DateTime // semana de produção (lista de compras)
+  startConsumptionDate DateTime? // base do alerta de recompra
+  daysOfFood           Decimal?    @db.Decimal(8, 2) // snapshot calculado
+  notes                String?
+  items                BatchItem[]
+  pricing              Pricing?
+  alert                Alert?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+}
+
+// Gramas totais (e custo) de cada ingrediente no lote (Ficha de Cozinha)
+model BatchItem {
+  id           String     @id @default(uuid())
+  batchId      String
+  batch        Batch      @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  ingredientId String
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
+  gramsTotal   Decimal    @db.Decimal(10, 2)
+  costTotal    Decimal    @db.Decimal(10, 2)
+}
+
+// ---------- Precificação ----------
+model Pricing {
+  id                String   @id @default(uuid())
+  batchId           String   @unique
+  batch             Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  ingredientCost    Decimal  @db.Decimal(10, 2)
+  packagingUnitCost Decimal  @db.Decimal(10, 2)
+  packagingCost     Decimal  @db.Decimal(10, 2)
+  laborHours        Decimal  @db.Decimal(6, 2)
+  laborCostPerHour  Decimal  @db.Decimal(10, 2)
+  laborCost         Decimal  @db.Decimal(10, 2)
+  totalCost         Decimal  @db.Decimal(10, 2)
+  marginPercent     Decimal  @db.Decimal(5, 2)
+  suggestedPrice    Decimal  @db.Decimal(10, 2)
+  profit            Decimal  @db.Decimal(10, 2)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ---------- Alertas / CRM ----------
+enum AlertStatus {
+  PENDING
+  SENT
+  DISMISSED
+  REPURCHASED
+}
+
+model Alert {
+  id           String      @id @default(uuid())
+  batchId      String      @unique
+  batch        Batch       @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  customerId   String
+  customer     Customer    @relation(fields: [customerId], references: [id])
+  reminderDate DateTime // startConsumptionDate + (daysOfFood - bufferDays)
+  status       AlertStatus @default(PENDING)
+  message      String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+// ---------- Configurações globais (custo fixo/hora, embalagem, margem) ----------
+model Setting {
+  id                   Int      @id @default(1)
+  laborCostPerHour     Decimal  @default(0) @db.Decimal(10, 2)
+  packagingUnitCost    Decimal  @default(0) @db.Decimal(10, 2)
+  defaultMarginPercent Decimal  @default(0) @db.Decimal(5, 2)
+  reminderBufferDays   Int      @default(5)
+  updatedAt            DateTime @updatedAt
+}
