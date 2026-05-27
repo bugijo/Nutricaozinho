@@ -27,4 +27,5 @@ const routes = [
 // usa rotas por hash (#) para funcionar sem servidor. Em produção (http/https),
 // usa rotas normais.
 const openedFromFile = typeof window !== 'undefined' && window.location.protocol === 'file:';
-export const router = openedFromFile ? createHashRouter(routes) : createBrowserRouter(routes);
+const forceHash = import.meta.env.VITE_USE_HASH === 'true';
+export const router = openedFromFile || forceHash ? createHashRouter(routes) : createBrowserRouter(routes);
