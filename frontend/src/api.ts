@@ -57,6 +57,8 @@ export interface Customer {
 export interface Pet {
   id: string;
   name: string;
+  breed?: string | null;
+  birthDate?: string | null;
   weightKg: string;
   activityFactor: string;
   customerId: string;

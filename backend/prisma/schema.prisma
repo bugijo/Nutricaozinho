@@ -25,17 +25,19 @@ model Customer {
 
 // ---------- Pet ----------
 model Pet {
-  id             String   @id @default(uuid())
+  id             String    @id @default(uuid())
   name           String
-  weightKg       Decimal  @db.Decimal(6, 2)
-  activityFactor Decimal  @db.Decimal(4, 2) // ex: 1.6
+  breed          String? // raça
+  birthDate      DateTime? @db.Date // data de nascimento (idade é calculada na hora)
+  weightKg       Decimal   @db.Decimal(6, 2)
+  activityFactor Decimal   @db.Decimal(4, 2) // ex: 1.6
   notes          String?
   customerId     String
-  customer       Customer @relation(fields: [customerId], references: [id])
+  customer       Customer  @relation(fields: [customerId], references: [id])
   diets          Diet[]
   batches        Batch[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 // ---------- Ingredientes ----------

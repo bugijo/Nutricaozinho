@@ -27,7 +27,7 @@ interface Ingredient {
   active: boolean;
 }
 interface Customer { id: string; name: string; phone?: string; email?: string; notes?: string }
-interface Pet { id: string; name: string; weightKg: string; activityFactor: string; customerId: string }
+interface Pet { id: string; name: string; breed?: string | null; birthDate?: string | null; weightKg: string; activityFactor: string; customerId: string }
 interface DietItem { ingredientId: string; role: Category; shareWithinGroup: number }
 interface Diet {
   id: string; name: string; petId: string;
@@ -75,7 +75,7 @@ function seed() {
 
   const maria: Customer = { id: uid(), name: 'Maria Silva', phone: '(11) 90000-0000' };
   db.customers.push(maria);
-  const chloe: Pet = { id: uid(), name: 'Chloe', weightKg: '10', activityFactor: '1.6', customerId: maria.id };
+  const chloe: Pet = { id: uid(), name: 'Chloe', breed: 'Shiba Inu', birthDate: '2021-09-15', weightKg: '10', activityFactor: '1.6', customerId: maria.id };
   db.pets.push(chloe);
 
   db.diets.push({
@@ -185,13 +185,22 @@ async function handle(method: string, path: string, body?: any): Promise<any> {
     if (method === 'GET' && id) { const p = db.pets.find((x) => x.id === id); return p ?? notFound(); }
     if (method === 'POST') {
       if (!db.customers.some((c) => c.id === body.customerId)) throw httpErr(409, 'Cliente inválido.');
-      const p: Pet = { id: uid(), name: body.name, weightKg: s(body.weightKg), activityFactor: s(body.activityFactor), customerId: body.customerId };
+      const p: Pet = {
+        id: uid(), name: body.name, breed: body.breed ?? null,
+        birthDate: body.birthDate ? new Date(body.birthDate).toISOString().slice(0, 10) : null,
+        weightKg: s(body.weightKg), activityFactor: s(body.activityFactor), customerId: body.customerId,
+      };
       db.pets.push(p); return p;
     }
     if (method === 'PUT') {
       const p = db.pets.find((x) => x.id === id); if (!p) return notFound();
       if (body.customerId && !db.customers.some((c) => c.id === body.customerId)) throw httpErr(409, 'Cliente inválido.');
-      Object.assign(p, { ...body, weightKg: body.weightKg != null ? s(body.weightKg) : p.weightKg, activityFactor: body.activityFactor != null ? s(body.activityFactor) : p.activityFactor });
+      Object.assign(p, {
+        ...body,
+        weightKg: body.weightKg != null ? s(body.weightKg) : p.weightKg,
+        activityFactor: body.activityFactor != null ? s(body.activityFactor) : p.activityFactor,
+        birthDate: body.birthDate ? new Date(body.birthDate).toISOString().slice(0, 10) : p.birthDate,
+      });
       return p;
     }
   }

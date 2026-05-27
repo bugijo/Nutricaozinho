@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api, type Customer, type Pet } from '../api';
 import { BigButton, Card, ErrorBox, Field, PageShell, SelectField } from '../components/ui';
+import { formatAge } from '../utils/age';
 
 export function CustomersPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -13,6 +14,8 @@ export function CustomersPage() {
   // Pet (novo ou edição)
   const [editingPetId, setEditingPetId] = useState<string | null>(null);
   const [petName, setPetName] = useState('');
+  const [petBreed, setPetBreed] = useState('');
+  const [petBirthDate, setPetBirthDate] = useState('');
   const [petWeight, setPetWeight] = useState('');
   const [petFactor, setPetFactor] = useState('1.6');
   const [petCustomerId, setPetCustomerId] = useState('');
@@ -41,6 +44,8 @@ export function CustomersPage() {
   function startEditPet(p: Pet) {
     setEditingPetId(p.id);
     setPetName(p.name);
+    setPetBreed(p.breed ?? '');
+    setPetBirthDate(p.birthDate ? p.birthDate.slice(0, 10) : '');
     setPetWeight(p.weightKg);
     setPetFactor(p.activityFactor);
     setPetCustomerId(p.customerId);
@@ -50,6 +55,8 @@ export function CustomersPage() {
   function cancelEditPet() {
     setEditingPetId(null);
     setPetName('');
+    setPetBreed('');
+    setPetBirthDate('');
     setPetWeight('');
   }
 
@@ -58,6 +65,8 @@ export function CustomersPage() {
     try {
       const payload = {
         name: petName,
+        breed: petBreed || undefined,
+        birthDate: petBirthDate || undefined,
         weightKg: Number(petWeight),
         activityFactor: Number(petFactor),
         customerId: petCustomerId,
@@ -101,6 +110,14 @@ export function CustomersPage() {
             ))}
           </SelectField>
           <Field label="Nome do pet" value={petName} onChange={(e) => setPetName(e.target.value)} placeholder="Ex: Chloe" />
+          <Field label="Raça" value={petBreed} onChange={(e) => setPetBreed(e.target.value)} placeholder="Ex: Shiba Inu (ou SRD)" />
+          <Field
+            label="Data de nascimento"
+            hint="A idade é calculada sozinha a partir desta data."
+            type="date"
+            value={petBirthDate}
+            onChange={(e) => setPetBirthDate(e.target.value)}
+          />
           <Field label="Peso do pet (kg)" numeric value={petWeight} onChange={(e) => setPetWeight(e.target.value)} placeholder="10" />
           <SelectField label="Nível de atividade" value={petFactor} onChange={(e) => setPetFactor(e.target.value)}>
             <option value="1.2">Parado / castrado (1.2)</option>
@@ -126,8 +143,12 @@ export function CustomersPage() {
           {c.phone && <p className="text-base text-gray-600">{c.phone}</p>}
           <ul className="mt-2 text-base space-y-1">
             {(c.pets ?? []).map((p) => (
-              <li key={p.id} className="flex items-center justify-between">
-                <span>🐶 {p.name} — {p.weightKg} kg</span>
+              <li key={p.id} className="flex items-center justify-between gap-3">
+                <span>
+                  🐶 <strong>{p.name}</strong>
+                  {p.breed ? ` · ${p.breed}` : ''} — {p.weightKg} kg
+                  <span className="block text-gray-600">{formatAge(p.birthDate)}</span>
+                </span>
                 <button onClick={() => startEditPet(p)} className="text-amberDark font-bold underline shrink-0">
                   Editar
                 </button>

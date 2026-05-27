@@ -7,6 +7,8 @@ export const petsRouter = Router();
 
 const petSchema = z.object({
   name: z.string().min(1),
+  breed: z.string().optional(),
+  birthDate: z.coerce.date().optional(),
   weightKg: z.number().positive(),
   activityFactor: z.number().positive(),
   notes: z.string().optional(),
